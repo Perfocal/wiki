@@ -2,7 +2,7 @@
 
 The back-end and API infrastructure is built upon the Loopback framework, a Node.js RESTful API framework with in-built API and database relation/model management.
 
-All listed API requests can be viewed at `localhost:3000/explorer/` when `npm run dev:server` is running in the background. Additionally, all up-to-date public API requests are listed and have examples at http://178.62.80.203:3000/explorer/. This is a Loopback API explorer running off of the Perfocal beta server hosted on Digital Ocean (as all of Perfocal's servers are). All requests have example values and model definitions listed as well as a response shown in JSON format after an example request has been prossessed either successfully or an error is thrown.
+All listed API requests can be viewed at `localhost:3000/explorer/` when `npm run dev:server` is running in the background. Additionally, all up-to-date public API requests are listed and have examples at <http://178.62.80.203:3000/explorer/>. This is a Loopback API explorer running off of the Perfocal beta server hosted on Digital Ocean (as all of Perfocal's servers are). All requests have example values and model definitions listed as well as a response shown in JSON format after an example request has been prossessed either successfully or an error is thrown.
 
 Live and Beta production server instances are handled and contained by **Docker** in images named `perfocal.com/perfocal:x.y.z` where `x`, `y` and `z` are major, minor and patch version numbers respectively.
 
@@ -307,8 +307,8 @@ Gets the previous `EventRequest` in the queue
 ### Properties
 
 - **property** - `type` - column_name - description
-- id - `number` - id - Unique identifier
-- created - `date` - created - Timestamp of creation of order
+- **id** - `number` - id - Unique identifier
+- **created** - `date` - created - Timestamp of creation of order
 - **customerId** - `number` - customer_id - Id of the related event's customer.
 - **photographerId** - `number` - photographer_id - Id of the photographer assigned to the event. Foreign key for `Photographer`
 - **eventId** - `string` - event_id - Id of the event that contains the order. Foreign key for `Event`
@@ -316,7 +316,7 @@ Gets the previous `EventRequest` in the queue
 - **status** - `string` - status - Current order status: '**created**', '**uploaded**', '**overdue**', '**cancelled**'
 - **overdue** - `date` - overdue - Timestamp for when the order is overdue
 - **editorsNote** - `string` - editors_note - Note **for the editor** left by the photographer
-- photographersNote - `string` - photogs_note - Note **for the photographer** left by the editor
+- **photographersNote** - `string` - photogs_note - Note **for the photographer** left by the editor
 
 ---
 
