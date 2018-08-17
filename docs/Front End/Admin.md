@@ -1,8 +1,12 @@
-# Admin
+#  Admin
 
 -----
 
-# Admin - Promocodes
+# Photographers
+
+# Orders
+
+# Promocodes
 
 ## View
 
@@ -39,5 +43,3 @@ Batch creation is as follows:
 ### Note: The names are 'WYSIWYG' (what you see is what you get), i.e. if you enter `test`, the promocode name will be `test`
 
 ![image](https://user-images.githubusercontent.com/15820577/41859131-642e3f6a-7893-11e8-8708-87e71ae0c8a4.png)
-
-Suggestions and improvements welcome.
