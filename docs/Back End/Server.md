@@ -3,11 +3,12 @@
 The back-end and API infrastructure is built upon the Loopback framework, a Node.js RESTful API framework with in-built API and database relation/model management.
 
 All listed API requests can be viewed at `localhost:3000/explorer/` when `npm run dev:server` is running in the background. Additionally, all up-to-date public API requests are listed and have examples at <http://178.62.80.203:3000/explorer/>. This is a Loopback API explorer running off of the Perfocal beta server hosted on Digital Ocean (as all of Perfocal's servers are). All requests have example values and model definitions listed as well as a response shown in JSON format after an example request has been prossessed either successfully or an error is thrown.
+*A large number of the API requests require an **Authorisation Token** as not all requests are accessible by all users.*
 
 Live and Beta production server instances are handled and contained by **Docker** in images named `perfocal.com/perfocal:x.y.z` where `x`, `y` and `z` are major, minor and patch version numbers respectively.
 
 All major database models and server methods can be viewed in the `server/models/` folder. Please note that server methods that have empty export functions do not have custom methods and only use default Loopback REST methods.
-All custom methods are explained in detail in the list below. Some methods listed below are private and therefore do not have request URLs, these methods are therefore only used to perform specific functions within some other, public, requests.
+All custom methods are explained in detail in the list below. Some methods listed below are private and therefore do not have request URLs, these methods are therefore only used to perform specific functions within some other requests.
 
 -----
 
@@ -140,7 +141,7 @@ The function finds all photographer certificates that match a given `PhotoCatego
 - **property** - `type` - column_name - description
 - **id** - `string` - id - Event's unique identifier formed using 6 random alphanumerics
 - **created** - `date` - created - Timestamp for creation of event
-- **sceneId** - `number` - scene_id - Id of `Scene`/`Photoscene` the Event is using (reword?). Foreign key for `Photoscene`
+- **sceneId** - `number` - scene_id - Related `Photoscene` id. Foreign key for `Photoscene`
 - **customerId** - `number` - customer_id - Id of customer user that created the event. Foreign key for `User`
 - **firstName** - `string` - first_name - Customer's first name
 - **lastName** - `string` - last_name - Customer's last name
@@ -156,7 +157,7 @@ The function finds all photographer certificates that match a given `PhotoCatego
 - **addons** - `array` - addons - List of addons that the customer has purchased with the event
 - **additionalDetails** - `string` - additional_details - Any additional details a customer provides for photographer/admin
 - **status** - `string` - status - Current event status: '**created**', '**paid**', '**matching**', '**stopping**', '**stopped**', '**assigned**', '**delivering**', '**delivered**', '**delivered**', '**fulfilled**', '**cancelled**', '**expired**'
-- **packageId** - `number` - package_id - Id of `Package/Pricing` the Event is using (reword?). Foreign key for `Pricing`
+- **packageId** - `number` - package_id - Related `Pricing` id. Foreign key for `Pricing`
 - **duration** - `string` - duration - String for how long the Event lasts for, '**30 minutes**', '**1 hour**', '**2 hours**', '**3 hours**', '**4 hours**', '**8 hours**'
 - **shareLink** - `string` - share_link - Randomly generated character string for public customer galleries
 - **allowDownload** - `boolean` - allow_download - Status for allowing guests to download from public galleries
@@ -506,7 +507,7 @@ Deletes all images matching the `where` filter.
 **Accepts: `id`: `string` via `path`, `res`: `object` via `res`, optional `expires`: `number` via `query`**
 
 *If `expires` is not included, `expires` defaults to `3600`*
-Gets signed download URL from AWS S3 bucket
+Gets signed download URL from AWS S3 bucket and redirects the posted URL to he download URL.
 
 **Returns `302 HTTP redirect`**
 
@@ -529,16 +530,15 @@ Gets signed download URL from AWS S3 bucket
 
 All server jobs are listed under `server/jobs.js` and are handled by 'Kue', a Node.js job queue library. This allows the server to queue up several different jobs without having to wait for internal `async/await` or callbacks to move through a job queue.
 
-These jobs allow the server to run tasks which are separate from the API service but perform critical tasks such as sending emails, match-making, image resizing and album zipping.
+These jobs allow the server to run tasks which are separate from the API service but perform critical tasks such as sending emails/SMS/Slack notifications, match-making, image resizing and album zipping.
 
-Listed below are the more important and, sometimes, more complicated server jobs.
+Listed below are the most important and, sometimes, more complicated server jobs.
 
 ### `match-making`
 
-Gets `EventRequest` from given request `id`.
-Checks the waitlist for `EventRequests`. If there is someone in the waitlist, first place gets 'awarded' the job and any others are sent `email:photog/job-taken`. 
-Sets the previous `EventRequest.status` to `overdue`.
-Sets an overdue time for current-time + 5 minutes unless the current time is after 11PM (23 hours), then the overdue time is set to 8:05AM of the next day.
+Checks the waitlist for `EventRequests`. If there is someone in the waitlist,  the first `EventRequest` in the waitlist is assigned the job and any others are sent `email:photog/job-taken`.
+If there is a previous `EventRequest`, the  `EventRequest.status` is set to `overdue`.
+Sets an overdue time for the current time + 5 minutes unless the current time is after 11PM (23 hours), then the overdue time is set to 8:05AM of the next day.
 Creates `send-event-request` with necessary request and photographer information.
 
 ### `send-event-request`
@@ -563,4 +563,4 @@ Once all edited image albums have been zipped and uploaded, the job then calls `
 Gets all `large` images and resizes each image depending on which image `type` is passed as a parameter; `thumbnail`, `web` or `standard`.
 All existing images of that `type` are then deleted using `Image.destroyAll()`.
 Each new image is then given a UUID filename and the `originalName` is updated to include the new image `type`. The image is then uploaded to AWS S3 and an `Image` object is created.
-When all images have been resized and uploaded, the job calls `Event.createZIP()` to generate a zipped album for the image `type`
+When all images have been resized and uploaded, the job calls `Event.createZIP()` to generate a zipped album for the image `type`.
